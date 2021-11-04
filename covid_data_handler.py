@@ -1,4 +1,5 @@
 from uk_covid19 import Cov19API
+import sched, time
 
 
 def parse_csv_data(csv_filename):
@@ -42,10 +43,27 @@ def process_covid_csv_data(covid_csv_data):
     return last7days_cases, current_hospital_cases, total_deaths
 
 
-# TODO check with Matt if "default values" means default
-#  constructor; and if so, change function to class and set
-#  default constructor to exeter and ltla
-def covid_API_request(location, location_type):
+def parse_api_data(data):
+    """Parses data from the API and returns as a dictionary"""
+    line = data.splitlines()[1]
+    line = line.strip()
+    recent = line.split(",")
+
+    # Change to nested dictionaries (or list[] for some keys) 
+    # if you need to keep data from all dates
+    dictionary = {
+            "areaCode": recent[0],
+            "areaName": recent[1],
+            "areaType": recent[2],
+            "date": recent[3],
+            "cumDailyNsoDeathsByDeathDate": recent[4],
+            "hospitalCases": recent[5],
+            "newCasesBySpecimenDate": recent[6]
+            }
+    return dictionary
+
+
+def covid_API_request(location="Exeter", location_type="ltla"):
     """Pull data from the API"""
     use_filters = [
         f"areaType={location_type}",
@@ -65,11 +83,20 @@ def covid_API_request(location, location_type):
 
     use_api = Cov19API(
         filters=use_filters,
-        structure=get_structure,
-        # latest_by = "newCasesBySpecimenDate"
+        structure=get_structure
         )
 
     data = use_api.get_csv()
-    print(data)
 
-covid_API_request("Exeter", "ltla")
+    return parse_api_data(data)
+
+
+# TODO make sure that update interval is set to correct value
+# we are assuming that update interval is in seconds
+# can change interval to a particular time of day later on if necessary
+def schedule_covid_updates(update_interval=10, update_name="thing"):
+    """Get periodical updates from API"""
+    while True:
+        update_api = sched.scheduler()
+        update_api.enter(update_interval, 1, covid_API_request)
+        update_api.run()
