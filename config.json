@@ -1,0 +1,15 @@
+{
+	"covid_minor": "Exeter",
+	"covid_minor_id": "ltla",
+	"covid_major": "England",
+	"covid_major_id": "nation",
+	"news_api_url_stub": "https://newsapi.org/v2/everything?",
+	"news_keywords": "Covid COVID-19 coronavirus",
+	"news_API_key": "",
+	"news_lang": "en",
+	"domains": "",
+	"sort": "relevancy",
+	"max_articles": "5",
+	"max_article_age": "",
+	"image": "covid.png"
+}
